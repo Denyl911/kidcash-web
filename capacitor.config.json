@@ -1,0 +1,8 @@
+{
+  "appId": "io.ionic.starter",
+  "appName": "Kidcash",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}
