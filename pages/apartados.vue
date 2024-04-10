@@ -10,12 +10,10 @@ const router = useIonRouter();
 const toast = useToast();
 
 const total = ref(0);
-const modalOpen = ref(false);
 const modalAdd = ref(false);
 const allApartados = ref([]);
 const allAhorros = ref([]);
 const obj = ref(0);
-
 const ahorro = ref({
   amount: 0,
   apartado: '',
@@ -35,9 +33,6 @@ onMounted(() => {
       total.value -= el.amount;
     }
   });
-  if (apartados.length == 0) {
-    modalOpen.value = true;
-  }
 });
 
 onUpdated(() => {
@@ -55,11 +50,6 @@ onUpdated(() => {
   });
 });
 
-const crearApartado = () => {
-  modalOpen.value = false;
-  router.push('/crearApartado');
-};
-
 const crearAhorro = () => {
   const ahorros = JSON.parse(localStorage.getItem('ahorros')) || [];
   ahorro.value.date = Date.now();
@@ -67,6 +57,7 @@ const crearAhorro = () => {
   localStorage.setItem('ahorros', JSON.stringify(ahorros));
   allAhorros.value = ahorros;
   modalAdd.value = false;
+  router.push('/home');
   toast.info('Ahorro registrado exitosamente');
 };
 
@@ -74,25 +65,59 @@ const setObj = () => {
   obj.value = allApartados.value.find((el) => el.name == ahorro.value.apartado);
 };
 
+const openAhorro = (name) => {
+  modalAdd.value = true;
+  ahorro.value.apartado = name;
+  obj.value = allApartados.value.find((el) => el.name == ahorro.value.apartado);
+};
+
 function sC(val) {
-  val = val.toFixed(2);
-  let num = val.toString().includes('.')
-    ? val.toString().split('.')[0]
-    : val.toString();
-  let len = num.toString().length;
-  let result = '';
-  let count = 1;
-  for (let i = len - 1; i >= 0; i--) {
-    result = num.toString()[i] + result;
-    if (count % 3 === 0 && count !== 0 && i !== 0) {
-      result = ',' + result;
+  if (val) {
+    val = val.toFixed(2);
+    let num = val.toString().includes('.')
+      ? val.toString().split('.')[0]
+      : val.toString();
+    let len = num.toString().length;
+    let result = '';
+    let count = 1;
+    for (let i = len - 1; i >= 0; i--) {
+      result = num.toString()[i] + result;
+      if (count % 3 === 0 && count !== 0 && i !== 0) {
+        result = ',' + result;
+      }
+      count++;
     }
-    count++;
+    if (val.toString().includes('.')) {
+      result = result + '.' + val.toString().split('.')[1];
+    }
+    return result;
   }
-  if (val.toString().includes('.')) {
-    result = result + '.' + val.toString().split('.')[1];
+}
+
+function formatearFecha(fecha) {
+  if (fecha) {
+    fecha = new Date(fecha);
+    const meses = [
+      'Enero',
+      'Febrero',
+      'Marzo',
+      'Abril',
+      'Mayo',
+      'Junio',
+      'Julio',
+      'Agosto',
+      'Septiembre',
+      'Octubre',
+      'Noviembre',
+      'Diciembre',
+    ];
+
+    const dia = fecha.getDate();
+    const mesIndex = fecha.getMonth();
+    const año = fecha.getFullYear();
+
+    return `${meses[mesIndex]} ${dia}, ${año}`;
   }
-  return result;
 }
 </script>
 
@@ -104,7 +129,7 @@ function sC(val) {
         style="background-color: #e4ebe9"
       >
         <ion-icon :icon="menuOutline"></ion-icon>
-        <p class="font-bold m-0">RESUMEN</p>
+        <p class="font-bold m-0">MIS APARTADOS</p>
         <ion-icon :icon="notificationsOutline"></ion-icon>
       </section>
       <section
@@ -117,52 +142,77 @@ function sC(val) {
       <section
         class="flex items-center justify-between text-white bg-green-600 text-md px-4 py-3 mt-6"
       >
-        <ion-icon :icon="swapHorizontalOutline" size="large"></ion-icon>
         <ion-icon
+          :icon="swapHorizontalOutline"
+          @click="router.push('/home')"
+          size="large"
+        ></ion-icon>
+        <ion-icon
+          @click="router.push('/crearApartado')"
           :icon="addOutline"
           size="large"
-          @click="modalAdd = true"
         ></ion-icon>
         <ion-icon :icon="personCircleOutline" size="large"></ion-icon>
       </section>
       <section class="mt-5">
-        <p class="mx-3 text-green-700 font-bold">MOVIMIENTOS</p>
-        <Movimiento
-          v-for="el in allAhorros"
-          :title="el.apartado"
-          :amount="el.amount"
-          :date="el.date"
-          :positive="el.positive"
-        />
         <div
-          class="text-center"
-          @click="modalAdd = true"
-          v-if="allAhorros.length == 0"
+          v-for="ap in allApartados"
+          class="grid grid-cols-10 rounded-lg shadow mx-4 p-3 gap-3 mb-3"
+          @click="openAhorro(ap.name)"
         >
-          <h4 class="mx-10 pt-28 text-gray-700 font-semibold">
-            Parece que no has ahorrado nada crea tu primer ahorro <br />
-            <ion-icon
-              class="mt-5"
-              :icon="addOutline"
-              style="font-size: 2rem"
-            ></ion-icon>
-          </h4>
+          <div class="col-span-3 flex items-center justify-center">
+            <img
+              src="/img/apartado.png"
+              alt="Apartado"
+              style="width: 6rem; height: auto"
+            />
+          </div>
+          <div class="col-span-7">
+            <h3 class="font-bold">{{ ap.name }}</h3>
+            <h3 class="mt-3 text-gray-700">
+              Objetivo:
+              <span class="font-semibold text-green-600"
+                >${{ sC(ap.amount) }}</span
+              >
+            </h3>
+            <div
+              class="bg-slate-100 rounded-full"
+              style="width: 100%; height: 5px"
+            >
+              <div
+                class="bg-green-500 rounded-full"
+                :style="`width: ${(ap.actual * 100) / ap.amount}%; height: 5px`"
+              ></div>
+            </div>
+            <div class="text-right mt-3">
+              <p class="text-gray-400 me-4">
+                <small>{{ formatearFecha(ap.createdAt) }}</small>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div
+          class="grid grid-cols-10 rounded-lg shadow mx-4 p-3 gap-3 mb-32"
+          style="border: 2px dashed #9f9f9f"
+          @click="router.push('/crearApartado')"
+        >
+          <div class="col-span-3 flex items-center justify-center">
+            <img
+              src="/img/aparta2.png"
+              alt="Apartado"
+              style="width: 6rem; height: auto"
+            />
+          </div>
+          <div class="col-span-7">
+            <h3 class="font-bold text-green-700">Crear aparatado</h3>
+
+            <h5 class="mt-3 text-gray-700 font-sm">
+              Crea tu proximo guardadito
+            </h5>
+          </div>
         </div>
       </section>
       <Foot />
-
-      <MazDialog v-model="modalOpen" no-close persistent>
-        <div class="text-center">
-          <h2 class="font-bold text-green-600 mb-5">MI PRIMER AHORRO</h2>
-          <p class="text-xl">Vamos a crear tu primer aparatado de ahorro</p>
-          <MazBtn class="mt-6" color="success" @click="crearApartado">
-            Crear apartado
-          </MazBtn>
-        </div>
-        <template #footer>
-          <!-- <MazBtn @click="close"> Confirm </MazBtn> -->
-        </template>
-      </MazDialog>
 
       <MazDialog v-model="modalAdd">
         <div class="text-center">

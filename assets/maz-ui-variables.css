@@ -105,7 +105,7 @@
   --maz-bg-color-dark: hsl(235, 16%, 15%);
   --maz-bg-color-dark-light: hsl(235, 16%, 19%);
   --maz-bg-color-dark-lighter: hsl(235, 16%, 22%);
-  --maz-bg-overlay: hsl(0, 0%, 0%);
+  --maz-bg-overlay: hsla(0, 0%, 0%, 0.308);
   --maz-border-width: 0.125rem;
   --maz-border-radius: 0.5rem;
   --maz-font-family: system-ui, -apple-system, blinkmacsystemfont, 'Segoe UI', roboto, oxygen,

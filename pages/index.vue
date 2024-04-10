@@ -1,6 +1,9 @@
 <script setup>
 const router = useIonRouter();
 setTimeout(() => {
+  if (localStorage.getItem('user')) {
+    return router.push('/home');
+  }
   router.push('/welcome');
 }, 4000);
 </script>

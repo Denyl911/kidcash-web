@@ -1,5 +1,6 @@
 <script setup>
 import { arrowForward } from 'ionicons/icons';
+const toast = useToast();
 
 const router = useIonRouter();
 const actual = ref(0);
@@ -12,12 +13,11 @@ const slides = ref([
 const user = ref({
   name: '',
   lastName: '',
-  birthDate: '',
+  birthDate: null,
   email: '',
   password: '',
 });
 
-const bDate = ref();
 const checked = ref(false);
 
 const nextSlide = (n) => {
@@ -25,9 +25,27 @@ const nextSlide = (n) => {
     actual.value = n;
   } else {
     if (actual.value < 1) {
-      actual.value += 1;
+      if (user.value.name && user.value.lastName && user.value.birthDate) {
+        actual.value += 1;
+      } else {
+        toast.error('Faltan campos por llenar!');
+      }
     } else {
-      router.push('/home');
+      if (!checked.value) {
+        return toast.warning('Acepta los terminos y condiciones primero!');
+      }
+      if (
+        user.value.name &&
+        user.value.lastName &&
+        user.value.birthDate &&
+        user.value.email &&
+        user.value.password
+      ) {
+        localStorage.setItem('user', JSON.stringify(user.value));
+        router.push('/home');
+      } else {
+        toast.error('Faltan campos por llenar!');
+      }
     }
   }
   if (actual.value == 1) {
@@ -86,7 +104,7 @@ const goLogin = () => {
             <MazPicker
               color="success"
               class="mt-8"
-              v-model="bDate"
+              v-model="user.birthDate"
               format="DD-MM-YYYY"
               label="Fecha de nacimiento"
               locale="es-MX"
