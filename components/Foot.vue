@@ -6,16 +6,16 @@ const router = useIonRouter();
 <template>
   <section
     style="
-      background-color: #e4ebe9;
+      background-color: #f3f3f3;
       position: fixed;
       bottom: 0px;
       width: 100vw;
       border-radius: 20px 20px 0px 0px;
     "
-    class="flex items-center justify-between text-green-700 text-md px-4 py-3 mt-6"
+    class="flex items-center justify-between text-rose-400 text-md px-4 py-3 mt-6"
   >
     <div
-      class="text-center hover:text-green-500"
+      class="text-center hover:text-rose-500"
       @click="router.push('/aprende')"
     >
       <ion-icon :icon="library" size="large"></ion-icon>
@@ -23,8 +23,8 @@ const router = useIonRouter();
     </div>
     <div
       @click="router.push('/home')"
-      class="bg-green-700 text-center hover:text-green-500 hover:bg-green-600"
-      style="color: #e4ebe9; width: 4rem; height: 4rem; border-radius: 100%"
+      class="bg-rose-400 text-center hover:text-rose-500 hover:bg-rose-500"
+      style="color: #f3f3f3; width: 4rem; height: 4rem; border-radius: 100%"
     >
       <ion-icon
         :icon="home"
@@ -33,7 +33,7 @@ const router = useIonRouter();
       <p style="margin-top: -10px">Inicio</p>
     </div>
     <div
-      class="text-center hover:text-green-500"
+      class="text-center hover:text-rose-500"
       @click="router.push('/apartados')"
     >
       <ion-icon :icon="albums" size="large"></ion-icon>

@@ -63,23 +63,23 @@ const goLogin = () => {
 <template>
   <ion-page>
     <ion-content class="ion-padding">
-      <main class="px-5 pt-10 text-green-600">
+      <main class="px-5 pt-10 text-rose-300">
         <div class="grid grid-cols-10 items-center">
           <div class="col-span-8">
             <h1 class="text-3xl font-bold">Registro</h1>
           </div>
-          <img class="col-span-2" src="/img/logo.png" alt="" />
+          <img class="col-span-2" src="/img/educash-logo.png" alt="" />
         </div>
         <div class="flex">
           <img
             class="mr-1"
-            :src="actual == 0 ? '/img/circleW.png' : '/img/circleG.png'"
+            :src="actual == 0 ? '/img/circleC.png' : '/img/circleG.png'"
             alt="Step 1"
             @click="nextSlide(0)"
           />
           <img
             class="mr-1"
-            :src="actual == 1 ? '/img/circleW.png' : '/img/circleG.png'"
+            :src="actual == 1 ? '/img/circleC.png' : '/img/circleG.png'"
             alt="Step 2"
             @click="nextSlide(1)"
           />
@@ -92,28 +92,27 @@ const goLogin = () => {
                 v-model="user.name"
                 label="Nombre"
                 placeholder="Tu nombre"
-                success
+                color="danger"
               />
               <MazInput
                 v-model="user.lastName"
                 label="Apellidos"
                 placeholder="Tus apellidos"
-                success
+                color="danger"
               />
             </div>
             <MazPicker
-              color="success"
+              color="danger"
               class="mt-8"
               v-model="user.birthDate"
               format="DD-MM-YYYY"
               label="Fecha de nacimiento"
               locale="es-MX"
-              success
             />
             <p class="mt-3 text-gray-500">
               <small
                 >Ya tienes cuenta?
-                <strong class="text-green-600" @click="goLogin"
+                <strong class="text-rose-400" @click="goLogin"
                   >Iniciar Sesión</strong
                 ></small
               >
@@ -124,7 +123,7 @@ const goLogin = () => {
               v-model="user.email"
               label="Correo electronico"
               placeholder="juan98@gmail.com"
-              success
+              color="danger"
             />
             <MazInput
               class="mt-6"
@@ -132,26 +131,26 @@ const goLogin = () => {
               label="Contraseña"
               placeholder="********"
               type="password"
-              success
+              color="danger"
             />
             <MazCheckbox
               v-model="checked"
               size="mini"
-              color="success"
+              color="danger"
               class="mt-5"
             >
               <small class="text-gray-500"
                 >Acepto los
-                <strong class="text-green-600">Terminos y Condiciones</strong> y
+                <strong class="text-rose-400">Terminos y Condiciones</strong> y
                 la
-                <strong class="text-green-600"
+                <strong class="text-rose-400"
                   >Politica de Privacidad</strong
                 ></small
               >
             </MazCheckbox>
           </div>
           <div class="text-right mt-10">
-            <MazBtn color="success" @click="nextSlide"
+            <MazBtn color="danger" @click="nextSlide"
               >{{ btnText
               }}<ion-icon
                 style="position: relative; top: 2px"

@@ -3,7 +3,7 @@ import { arrowForward } from 'ionicons/icons';
 const router = useIonRouter();
 const slides = ref([
   {
-    img: '/img/cochinito.png',
+    img: '/img/cochinito-1.png',
     title: '¡Bienvenido a "KidCash"',
     text: 'Registra tus ingresos y gastos diarios de forma divertida y aprende a administrar tu dinero como un experto.',
   },
@@ -42,10 +42,7 @@ const nextSlide = (n) => {
 <template>
   <ion-page>
     <ion-content class="ion-padding">
-      <div
-        class="text-green-600 min-h-screen"
-        style="background-color: #f8fcfc"
-      >
+      <div class="text-rose-400 min-h-screen" style="background-color: #f8fcfc">
         <div class="text-center">
           <img
             :src="`${slides[actual].img}`"
@@ -66,25 +63,25 @@ const nextSlide = (n) => {
         >
           <img
             class="mr-1"
-            :src="actual == 0 ? '/img/circleW.png' : '/img/circleG.png'"
+            :src="actual == 0 ? '/img/circleC.png' : '/img/circleG.png'"
             alt="Step 1"
             @click="nextSlide(0)"
           />
           <img
             class="mr-1"
-            :src="actual == 1 ? '/img/circleW.png' : '/img/circleG.png'"
+            :src="actual == 1 ? '/img/circleC.png' : '/img/circleG.png'"
             alt="Step 2"
             @click="nextSlide(1)"
           />
           <img
-            :src="actual == 2 ? '/img/circleW.png' : '/img/circleG.png'"
+            :src="actual == 2 ? '/img/circleC.png' : '/img/circleG.png'"
             alt="Step 3"
             @click="nextSlide(2)"
           />
         </div>
         <div style="position: absolute; bottom: 50px; right: 0px">
           <div class="text-right me-10 mt-10">
-            <MazBtn color="success" @click="nextSlide"
+            <MazBtn color="danger" @click="nextSlide"
               >{{ btnText
               }}<ion-icon
                 style="position: relative; top: 2px"

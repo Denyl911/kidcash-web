@@ -1,5 +1,5 @@
 <script setup>
-const props = defineProps(['title', 'date', 'amount', 'positive']);
+const props = defineProps(['title', 'date', 'amount', 'type']);
 function formatearFecha(fecha) {
   if (fecha) {
     fecha = new Date(fecha);
@@ -69,7 +69,7 @@ function sC(val) {
     <div class="col-span-2">
       <img
         class=""
-        :src="`/img/${props.positive ? 'happy' : 'angry'}.png`"
+        :src="`/img/${props.type == 'Ingreso' ? 'happy' : 'angry'}.png`"
         alt=""
       />
     </div>
@@ -80,7 +80,9 @@ function sC(val) {
       </p>
     </div>
     <div class="col-span-2">
-      <p class="m-0">{{ props.positive ? '+' : '-' }}${{ sC(props.amount) }}</p>
+      <p class="m-0">
+        {{ props.type == 'Ingreso' ? '+' : '-' }}${{ sC(props.amount) }}
+      </p>
       <p class="text-gray-400">
         <small>{{ formatearHora(props.date) }}</small>
       </p>

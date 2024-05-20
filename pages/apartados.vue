@@ -1,7 +1,6 @@
 <script setup>
+import moment from 'moment';
 import {
-  menuOutline,
-  notificationsOutline,
   addOutline,
   personCircleOutline,
   swapHorizontalOutline,
@@ -17,9 +16,14 @@ const obj = ref(0);
 const ahorro = ref({
   amount: 0,
   apartado: '',
-  positive: true,
+  type: 'Ingreso',
   date: null,
 });
+
+const alDia = ref(0);
+const alaSemana = ref(0);
+const alMes = ref(0);
+const alAno = ref(0);
 
 onMounted(() => {
   const apartados = JSON.parse(localStorage.getItem('apartados')) || [];
@@ -27,7 +31,7 @@ onMounted(() => {
   allApartados.value = apartados;
   allAhorros.value = ahorros;
   ahorros.forEach((el) => {
-    if (el.positive) {
+    if (el.type == 'Ingreso') {
       total.value += el.amount;
     } else {
       total.value -= el.amount;
@@ -42,7 +46,7 @@ onUpdated(() => {
   allAhorros.value = ahorros;
   total.value = 0;
   ahorros.forEach((el) => {
-    if (el.positive) {
+    if (el.type == 'Ingreso') {
       total.value += el.amount;
     } else {
       total.value -= el.amount;
@@ -58,17 +62,49 @@ const crearAhorro = () => {
   allAhorros.value = ahorros;
   modalAdd.value = false;
   router.push('/home');
+
+  const apt = allApartados.value.find((el) => el.name == ahorro.value.apartado);
+  apt.actual += ahorro.value.amount;
+  localStorage.setItem('apartados', JSON.stringify(allApartados.value));
   toast.info('Ahorro registrado exitosamente');
 };
 
 const setObj = () => {
   obj.value = allApartados.value.find((el) => el.name == ahorro.value.apartado);
+
+  if (obj.value.limitDate && obj.value.amount) {
+    const momentFechaInicial = moment();
+    const momentFechaFinal = moment(obj.value.limitDate);
+
+    const diferenciaDias = momentFechaFinal.diff(momentFechaInicial, 'days');
+    alDia.value = (obj.value.amount - obj.value.actual) / diferenciaDias;
+
+    const diferenciaSemanas = momentFechaFinal.diff(
+      momentFechaInicial,
+      'weeks'
+    );
+    if (diferenciaSemanas > 0) {
+      alaSemana.value =
+        (obj.value.amount - obj.value.actual) / diferenciaSemanas;
+    }
+
+    const diferenciaMeses = momentFechaFinal.diff(momentFechaInicial, 'months');
+    if (diferenciaMeses > 0) {
+      alMes.value = (obj.value.amount - obj.value.actual) / diferenciaMeses;
+    }
+
+    const diferenciaAnos = momentFechaFinal.diff(momentFechaInicial, 'years');
+    if (diferenciaAnos > 0) {
+      alAno.value = (obj.value.amount - obj.value.actual) / diferenciaAnos;
+    }
+  }
 };
 
 const openAhorro = (name) => {
   modalAdd.value = true;
   ahorro.value.apartado = name;
   obj.value = allApartados.value.find((el) => el.name == ahorro.value.apartado);
+  setObj();
 };
 
 function sC(val) {
@@ -90,8 +126,10 @@ function sC(val) {
     if (val.toString().includes('.')) {
       result = result + '.' + val.toString().split('.')[1];
     }
+
     return result;
   }
+  return '0.00';
 }
 
 function formatearFecha(fecha) {
@@ -124,23 +162,22 @@ function formatearFecha(fecha) {
 <template>
   <ion-page>
     <ion-content class="ion-padding">
+      <Navigation title="MIS APARTADOS" />
       <section
-        class="flex items-center justify-between text-green-700 text-md px-4 py-3 mb-0"
-        style="background-color: #e4ebe9"
-      >
-        <ion-icon :icon="menuOutline"></ion-icon>
-        <p class="font-bold m-0">MIS APARTADOS</p>
-        <ion-icon :icon="notificationsOutline"></ion-icon>
-      </section>
-      <section
-        class="text-green-700 text-center mt-0 py-10"
-        style="background-color: #e4ebe9; border-radius: 0px 0px 50px 50px"
+        class="text-rose-400 text-center mt-0 pt-10"
+        style="background-color: #f3f3f3; border-radius: 0px 0px 50px 50px"
       >
         <h2 class="text-2xl mt-0 mb-4">AHORROS TOTALES</h2>
         <p class="text-3xl font-bold m-0">${{ sC(total) }}</p>
+        <img
+          class="mx-auto"
+          style="width: 7rem; height: auto"
+          src="/img/cochi.png"
+          alt="Logo"
+        />
       </section>
       <section
-        class="flex items-center justify-between text-white bg-green-600 text-md px-4 py-3 mt-6"
+        class="flex items-center justify-between text-white bg-rose-300 text-md px-4 py-3 mt-6"
       >
         <ion-icon
           :icon="swapHorizontalOutline"
@@ -171,22 +208,28 @@ function formatearFecha(fecha) {
             <h3 class="font-bold">{{ ap.name }}</h3>
             <h3 class="mt-3 text-gray-700">
               Objetivo:
-              <span class="font-semibold text-green-600"
+              <span class="font-semibold text-rose-400"
                 >${{ sC(ap.amount) }}</span
               >
             </h3>
+            <!-- <h3 class="mt-0 text-gray-700" style="font-size: 1em">
+              Fecha limite:
+              <span class="font-semibold text-rose-400">{{
+                formatearFecha(ap.limitDate)
+              }}</span>
+            </h3> -->
             <div
               class="bg-slate-100 rounded-full"
               style="width: 100%; height: 5px"
             >
               <div
-                class="bg-green-500 rounded-full"
+                class="bg-rose-500 rounded-full"
                 :style="`width: ${(ap.actual * 100) / ap.amount}%; height: 5px`"
               ></div>
             </div>
             <div class="text-right mt-3">
               <p class="text-gray-400 me-4">
-                <small>{{ formatearFecha(ap.createdAt) }}</small>
+                <small>{{ formatearFecha(ap.limitDate) }}</small>
               </p>
             </div>
           </div>
@@ -204,7 +247,7 @@ function formatearFecha(fecha) {
             />
           </div>
           <div class="col-span-7">
-            <h3 class="font-bold text-green-700">Crear aparatado</h3>
+            <h3 class="font-bold text-rose-400">Crear aparatado</h3>
 
             <h5 class="mt-3 text-gray-700 font-sm">
               Crea tu proximo guardadito
@@ -216,28 +259,37 @@ function formatearFecha(fecha) {
 
       <MazDialog v-model="modalAdd">
         <div class="text-center">
-          <h2 class="font-bold text-green-600 mb-5" style="margin-top: -2rem">
+          <h2 class="font-bold text-rose-400 mb-5" style="margin-top: -2rem">
             AHORRAR
           </h2>
           <div v-if="ahorro.apartado" class="mb-5">
             <h4 class="font-semibold">Objetivo: ${{ sC(obj.amount) }}</h4>
-            <div
-              class="bg-slate-100 rounded-full"
-              style="width: 100%; height: 5px"
-            >
-              <div
-                class="bg-green-500 rounded-full"
-                :style="`width: ${
-                  (obj.actual * 100) / obj.amount
-                }%; height: 5px`"
-              ></div>
+            <div class="" v-if="alDia">
+              <div class="ms-3">
+                <p v-if="alDia">
+                  Deberias ahorrar
+                  <span class="text-rose-400">${{ sC(alDia) }}</span> al día
+                </p>
+                <p v-if="alaSemana">
+                  O ahorrar
+                  <span class="text-rose-400">${{ sC(alaSemana) }}</span> a la
+                  semana
+                </p>
+                <p v-if="alMes">
+                  O ahorrar
+                  <span class="text-rose-400">${{ sC(alMes) }}</span> al mes
+                </p>
+                <p v-if="alAno">
+                  O ahorrar
+                  <span class="text-rose-400">${{ sC(alAno) }}</span> al año
+                </p>
+              </div>
             </div>
           </div>
           <MazSelect
             v-model="ahorro.apartado"
             @selected-option="setObj"
             label="Selecciona el apartado"
-            color="success"
             :options="allApartados"
             option-value-key="name"
             option-label-key="name"
@@ -245,12 +297,11 @@ function formatearFecha(fecha) {
           />
           <MazSelect
             class="mt-4"
-            v-model="ahorro.positive"
+            v-model="ahorro.type"
             label="Tipo de movimiento"
-            color="success"
             :options="[
-              { label: 'Ingreso', value: true },
-              { label: 'Retiro', value: false },
+              { label: 'Ingreso', value: 'Ingreso' },
+              { label: 'Retiro', value: 'Retiro' },
             ]"
           />
           <MazInputNumber
@@ -260,10 +311,9 @@ function formatearFecha(fecha) {
             placeholder="$50"
             :min="1"
             :step="1"
-            color="success"
             style="min-width: 100%"
           />
-          <MazBtn class="mt-7" color="success" @click="crearAhorro">
+          <MazBtn class="mt-7" color="danger" @click="crearAhorro">
             Registrar ahorro
           </MazBtn>
         </div>
